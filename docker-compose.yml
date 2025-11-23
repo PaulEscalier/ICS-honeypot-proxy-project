@@ -1,0 +1,25 @@
+services:
+  iec-104:
+    build: ./honeypots/IEC-104
+    volumes:
+      - ./honeypots/IEC-104:/app
+    ports:
+      - 2404:2404
+  modbus:
+    build: ./honeypots/Modbus
+    volumes:
+      - ./honeypots/Modbus:/app
+    ports:
+      - 5020:5020
+  opcua:
+    build: ./honeypots/OPC-UA
+    volumes:
+      - ./honeypots/OPC-UA:/app
+    ports:
+      - 4840:4840
+  s7:
+    build: ./honeypots/S7
+    volumes:
+      - ./honeypots/S7:/app
+    ports:
+      - 102:102
