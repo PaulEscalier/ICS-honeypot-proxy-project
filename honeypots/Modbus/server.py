@@ -28,9 +28,13 @@ from pymodbus.server import (
     StartAsyncUdpServer,
 )
 
+logging.basicConfig(
+    level=logging.DEBUG,
+    format="%(asctime)s %(levelname)s %(name)s: %(message)s"
+)
 
 _logger = logging.getLogger(__file__)
-_logger.setLevel(logging.INFO)
+_logger.setLevel(logging.DEBUG)
 
 
 def setup_server(description=None, context=None, cmdline=None):

@@ -23,3 +23,11 @@ services:
       - ./honeypots/S7:/app
     ports:
       - 102:102
+  web-interface:
+    build: ./web interface
+    volumes:
+      - ./web interface:/app
+    ports:
+      - 5000:5000
+    depends_on:
+      - iec-104
