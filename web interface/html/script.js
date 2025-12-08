@@ -14,6 +14,17 @@ async function sendCmd(state) {
   console.log("Send: " + state);
 }
 
+async function sendOpcUaInterrogation() {
+  await fetch("/opcUaActivity", { method: "GET" });
+}
 async function sendModbusInterrogation() {
   await fetch("/modbusActivity", { method: "GET" });
+}
+
+async function sendOpcUaInterrogation() {
+  await fetch("/opcUaActivity", { method: "GET" });
+}
+
+async function sendS7Interrogation() {
+  await fetch("/s7Activity", { method: "GET" });
 }

@@ -1,12 +1,14 @@
 import time
+import logging
 from snap7.server import Server
+
+logging.basicConfig(level=logging.INFO)
 
 def main():
     srv = Server()
+
     srv.start(102)
-
     print("S7 server started")
-
     try:
         while True:
             event = srv.pick_event()
