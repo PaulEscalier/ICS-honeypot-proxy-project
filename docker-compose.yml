@@ -1,41 +1,9 @@
 services:
-  iec-104:
-    container_name: iec-104
-    build: ./honeypots/IEC-104
-    volumes:
-      - ./honeypots/IEC-104:/app
-    ports:
-      - 2404:2404
   modbus:
     container_name: modbus
     build: ./honeypots/Modbus
     volumes:
       - ./honeypots/Modbus:/app
     ports:
-      - 5020:5020
-  opcua:
-    container_name: opcua
-    build: ./honeypots/OPC-UA
-    volumes:
-      - ./honeypots/OPC-UA:/app
-    ports:
-      - 4840:4840
-  s7:
-    container_name: s7
-    build: ./honeypots/S7
-    volumes:
-      - ./honeypots/S7:/app
-    ports:
-      - 102:102
-
-  web-interface:
-    build: ./web interface
-    volumes:
-      - ./web interface:/app
-    ports:
-      - 5000:5000
-    depends_on:
-      - iec-104
-      - s7
-      - opcua
-      - modbus
+      - 502:502
+      - 8000:8000

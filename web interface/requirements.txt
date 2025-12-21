@@ -1,6 +1,0 @@
-fastapi
-pydantic
-pymodbus
-flask
-opcua
-python-snap7

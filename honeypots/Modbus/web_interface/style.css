@@ -1,0 +1,19 @@
+body {
+  background: #0b0e14;
+  color: #00ff99;
+  font-family: monospace;
+}
+
+.panel {
+  border: 1px solid #00ff99;
+  padding: 20px;
+  width: 300px;
+}
+
+.on {
+  color: lime;
+}
+
+.off {
+  color: red;
+}
