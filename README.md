@@ -4,24 +4,24 @@
 
 ### Activate the pump
 
-```Bash
+```bash
 modpoll -m tcp -a 1 -r 1 -c 1 -t 0 127.0.0.1 1
 ```
 
 ### Deactivate the pump
 
-```Bash
+```bash
 modpoll -m tcp -a 1 -r 1 -c 1 -t 0 127.0.0.1 0
 ```
 
 ### Activate the valve
 
-```Bash
+```bash
 modpoll -m tcp -a 1 -r 2 -c 1 -t 0 127.0.0.1 1
 ```
 
 ### Deactivate the valve
 
-```Bash
+```bash
 modpoll -m tcp -a 1 -r 2 -c 1 -t 0 127.0.0.1 0
 ```
