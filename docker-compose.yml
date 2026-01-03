@@ -7,3 +7,11 @@ services:
     ports:
       - 502:502
       - 8000:8000
+  s7:
+    container_name: s7
+    build: ./honeypots/S7
+    volumes:
+      - ./honeypots/S7:/app
+    ports:
+      - 102:102
+      - 8001:8001

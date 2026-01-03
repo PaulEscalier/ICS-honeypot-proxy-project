@@ -1,8 +1,9 @@
 import asyncio
 import uvicorn
-from fastapi import FastAPI, WebSocket
+from fastapi import FastAPI, WebSocket, Request
 from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
+from logger import logger
 
 from modbus_server import create_context, create_identity, start_modbus
 from process import process_loop
@@ -15,12 +16,29 @@ app.mount("/static", StaticFiles(directory="web_interface"), name="static")
 async def index():
     return FileResponse("web_interface/index.html")
 
+@app.middleware("http")
+async def log_requests(request: Request, call_next):
+    client_ip = request.client.host
+    path = request.url.path
+    method = request.method
+
+    logger.info(f"{client_ip} {method} {path}")
+
+    return await call_next(request)
+
 @app.websocket("/ws")
 async def websocket(ws: WebSocket):
+    client_ip = ws.client.host
+    logger.info(f"WebSocket connected from {client_ip}")
+
     await ws.accept()
-    while True:
-        await ws.send_json(process_state)
-        await asyncio.sleep(1)
+
+    try:
+        while True:
+            await ws.send_json(process_state)
+            await asyncio.sleep(1)
+    except Exception as e:
+        logger.warning(f"WebSocket disconnected ({client_ip})")
 
 async def main():
     context = create_context()

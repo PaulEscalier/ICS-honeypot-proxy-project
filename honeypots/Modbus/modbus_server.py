@@ -5,11 +5,15 @@ from pymodbus.datastore import (
     ModbusDeviceContext
 )
 from pymodbus.pdu.device import ModbusDeviceIdentification
+from modbus_blocks import (
+    LoggingCoilBlock,
+    LoggingHoldingRegisterBlock
+)
 
 def create_context():
     device = ModbusDeviceContext(
-        co=ModbusSequentialDataBlock(0, [0]*10),
-        hr=ModbusSequentialDataBlock(0, [25, 10] + [0]*8)
+        co=LoggingCoilBlock(0, [0]*100),
+        hr=LoggingHoldingRegisterBlock(0, [0]*100),
     )
     return ModbusServerContext(devices={1: device}, single=False)
 
