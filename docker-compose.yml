@@ -15,3 +15,11 @@ services:
     ports:
       - 102:102
       - 8001:8001
+  iec104:
+    container_name: iec104
+    build: ./honeypots/iec104
+    volumes:
+      - ./honeypots/iec104:/app
+    ports:
+      - 2404:2404
+      - 8002:8002
