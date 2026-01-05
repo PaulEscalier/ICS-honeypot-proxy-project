@@ -1,6 +1,6 @@
 import logging
 
-logger = logging.getLogger("iec104-honeypot")
+logger = logging.getLogger("ics-honeypot")
 logger.setLevel(logging.INFO)
 
 fmt = logging.Formatter("%(asctime)s | %(levelname)s | %(message)s")

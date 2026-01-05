@@ -1,44 +1,56 @@
 import asyncio
-import threading
 from fastapi import FastAPI, WebSocket
-from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse
-import uvicorn
-from process_simulation import process_loop
-import threading
+from fastapi.staticfiles import StaticFiles
 
-from s7_server import start_s7_server
-from s7_memory import plc_memory
+from state import process_state
 from logger import logger
+from s7_server import S7Honeypot
+from process import conveyor_loop
+import uvicorn
+
 
 app = FastAPI()
 app.mount("/static", StaticFiles(directory="web_interface"), name="static")
-
 
 @app.get("/")
 async def index():
     return FileResponse("web_interface/index.html")
 
+clients = []
 
 @app.websocket("/ws")
-async def ws(ws: WebSocket):
+async def ws_endpoint(ws: WebSocket):
     await ws.accept()
-    ip = ws.client.host
-    logger.info(f"HMI WebSocket connected from {ip}")
-
+    clients.append(ws)
     try:
         while True:
-            await ws.send_json(plc_memory.read())
+            await ws.send_json(process_state)
             await asyncio.sleep(1)
-    except Exception:
-        logger.info(f"HMI WebSocket disconnected {ip}")
+    finally:
+        clients.remove(ws)
 
+honeypot = S7Honeypot()
 
-def start_web():
-    uvicorn.run(app, host="0.0.0.0", port=8001)
+async def fake_s7_network():
+    while True:
+        await asyncio.sleep(5)
+
+async def main():
+    asyncio.create_task(conveyor_loop())
+    asyncio.create_task(fake_s7_network())
+    config = uvicorn.Config(
+        app,
+        host="0.0.0.0",
+        port=8001,
+        log_level="info"
+    )
+    server = uvicorn.Server(config)
+    await server.serve()
+
+    print("[+] Siemens S7 Conveyor Honeypot running")
+    await asyncio.Event().wait()
 
 
 if __name__ == "__main__":
-    threading.Thread(target=start_s7_server, daemon=True).start()
-    threading.Thread(target=process_loop, daemon=True).start()
-    start_web()
+    asyncio.run(main())

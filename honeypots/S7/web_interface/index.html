@@ -1,17 +1,26 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title>Process Control Panel</title>
+    <title>Industrial Conveyor HMI</title>
     <link rel="stylesheet" href="/static/style.css" />
   </head>
   <body>
-    <h1>Process Control Panel</h1>
+    <h1>Industrial Conveyor Control Panel</h1>
 
-    <div>Status:</div>
-    <div>Pump: <span id="pump"></span></div>
-    <div>Valve: <span id="valve"></span></div>
-    <div>Temperature: <span id="temperature"></span> °C</div>
-    <div>Pressure: <span id="pressure"></span> bar</div>
+    <div class="panel">
+      <div>Motor Speed: <span id="speed"></span> %</div>
+      <div>Load Weight: <span id="load"></span> kg</div>
+      <div>Temperature: <span id="temp"></span> °C</div>
+    </div>
+
+    <div class="panel">
+      <div>Belt: <span id="belt"></span></div>
+      <div>Jam Detected: <span id="jam"></span></div>
+      <div>Emergency Stop: <span id="estop"></span></div>
+    </div>
+
+    <h2>Security Alerts</h2>
+    <pre id="alerts"></pre>
 
     <script src="/static/app.js"></script>
   </body>

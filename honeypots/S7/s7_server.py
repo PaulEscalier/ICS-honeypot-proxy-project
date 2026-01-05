@@ -1,41 +1,62 @@
-import socket
+import struct
+from state import process_state
+from db_layout import DB1_LAYOUT, DB1_SIZE
 from logger import logger
 
-COTP_CC = bytes.fromhex(
-    "03 00 00 16"
-    "11 D0 00 00 00 01 00"
-    "C1 02 01 00"
-    "C2 02 01 02"
-    "C0 01 0A"
-)
+class S7Honeypot:
+    def __init__(self):
+        self.db = bytearray(DB1_SIZE)
+        self.sync_state_to_db()
 
-def start_s7_server(host="0.0.0.0", port=102):
-    sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    sock.bind((host, port))
-    sock.listen(5)
+    def sync_state_to_db(self):
+        for offset, (name, dtype) in DB1_LAYOUT.items():
+            value = process_state[name]
 
-    logger.info(f"S7 honeypot listening on {host}:{port}")
+            if dtype == "REAL":
+                self.db[offset:offset+4] = struct.pack(">f", float(value))
+            elif dtype == "BOOL":
+                self.db[offset] = 1 if value else 0
 
-    while True:
-        conn, addr = sock.accept()
-        ip, src_port = addr
-        logger.info(f"S7 connection from {ip}:{src_port}")
+    def sync_db_to_state(self):
+        for offset, (name, dtype) in DB1_LAYOUT.items():
+            if dtype == "REAL":
+                process_state[name] = struct.unpack(">f", self.db[offset:offset+4])[0]
+            elif dtype == "BOOL":
+                process_state[name] = bool(self.db[offset])
 
-        try:
-            data = conn.recv(1024)
-            logger.info(f"RX {ip}: {data.hex()}")
 
-            conn.sendall(COTP_CC)
-            logger.info(f"TX {ip}: COTP CC")
+    def read_db(self, start, size, client_ip="unknown"):
+        logger.info(
+            f"READ_DB | ip={client_ip} | start={start} | size={size}"
+        )
+        self.sync_state_to_db()
+        return self.db[start:start+size]
 
-            while True:
-                payload = conn.recv(1024)
-                if not payload:
-                    break
-                logger.info(f"S7 DATA {ip}: {payload.hex()}")
+    def write_db(self, start, data, client_ip="unknown"):
+        logger.warning(
+            f"WRITE_DB | ip={client_ip} | start={start} | bytes={len(data)}"
+        )
+        self.db[start:start+len(data)] = data
+        self.sync_db_to_state()
+        self.detect_attack(start, data, client_ip)
+    
+    def detect_attack(self, start, data, ip):
+        if start == 0 and len(data) >= 4:
+            speed = struct.unpack(">f", data[:4])[0]
+            if speed > 90:
+                logger.critical(
+                    f"ATTACK | High motor speed | ip={ip} | value={speed}"
+                )
+            if start == 9:
+                if data[0] == 0:
+                    logger.critical(
+                        f"ATTACK | Jam detection disabled | ip={ip}"
+                    )
+            if start == 10 and data[0] == 0:
+                logger.critical(
+                    f"ATTACK | Emergency stop released | ip={ip}"
+                )
 
-        except Exception as e:
-            logger.warning(f"Error with {ip}: {e}")
-        finally:
-            conn.close()
-            logger.info(f"Connection closed {ip}")
+
+
+

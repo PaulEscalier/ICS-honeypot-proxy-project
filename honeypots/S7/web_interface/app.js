@@ -1,15 +1,24 @@
 const ws = new WebSocket(`ws://${location.host}/ws`);
+const alerts = document.getElementById("alerts");
 
 ws.onmessage = (event) => {
   const d = JSON.parse(event.data);
-  set("pump", d.pump, "ON", "OFF");
-  set("valve", d.valve, "OPEN", "CLOSED");
-  document.getElementById("temperature").textContent = d.temperature.toFixed(1);
-  document.getElementById("pressure").textContent = d.pressure.toFixed(1);
+
+  set("speed", d.motor_speed.toFixed(1));
+  set("load", d.load_weight.toFixed(1));
+  set("temp", d.temperature.toFixed(1));
+
+  setState("belt", d.belt_running);
+  setState("jam", d.jam_detected);
+  setState("estop", d.emergency_stop);
 };
 
-function set(id, state, on, off) {
+function set(id, val) {
+  document.getElementById(id).textContent = val;
+}
+
+function setState(id, state) {
   const el = document.getElementById(id);
-  el.textContent = state ? on : off;
-  el.className = state ? "on" : "off";
+  el.textContent = state ? "ON" : "OFF";
+  el.className = state ? "alarm" : "ok";
 }

@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Industrial Furnace Control Panel</title>
+    <link rel="stylesheet" href="/static/style.css" />
+  </head>
+  <body>
+    <h1>Industrial Furnace Control Panel</h1>
+
+    <div class="card">
+      <h2>Process Parameters</h2>
+      <p>Temperature: <span id="temp">--</span> °C</p>
+      <p>Heater Power: <span id="power">--</span> %</p>
+      <p>Load Mass: <span id="mass">--</span> kg</p>
+      <p>Cooling System: <span id="cooling">--</span></p>
+    </div>
+
+    <div class="card alarm">
+      <h2>Status</h2>
+      <p>High Temperature Alarm: <span id="alarm">--</span></p>
+    </div>
+
+    <script src="/static/app.js"></script>
+  </body>
+</html>

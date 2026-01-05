@@ -23,3 +23,11 @@ services:
     ports:
       - 2404:2404
       - 8002:8002
+  opcua:
+    container_name: opcua
+    build: ./honeypots/opcua
+    volumes:
+      - ./honeypots/opcua:/app
+    ports:
+      - 4840:4840
+      - 8003:8003
