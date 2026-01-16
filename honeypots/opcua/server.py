@@ -1,7 +1,7 @@
 from opcua import Server
 from state import state
 from logger import logger
-
+import socket
 server = Server()
 server.set_endpoint("opc.tcp://0.0.0.0:4840/")
 server.set_server_name("Industrial Furnace OPC UA Server")
@@ -20,6 +20,15 @@ alarm  = furnace.add_variable(idx, "HighTempAlarm", state["alarm"])
 heater.set_writable()
 mass.set_writable()
 cool.set_writable()
+
+_original_accept = socket.socket.accept
+
+
+def logging_accept(self):
+    conn, addr = _original_accept(self)
+    logger.info(f"OPC UA client connected from {addr[0]}:{addr[1]}")
+    return conn, addr
+socket.socket.accept = logging_accept
 
 def run():
     server.start()
