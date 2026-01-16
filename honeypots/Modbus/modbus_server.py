@@ -4,11 +4,21 @@ from pymodbus.datastore import (
     ModbusServerContext,
     ModbusDeviceContext
 )
+from logger import logger
 from pymodbus.pdu.device import ModbusDeviceIdentification
 from modbus_blocks import (
     LoggingCoilBlock,
-    LoggingHoldingRegisterBlock
+    LoggingHoldingRegisterBlock,
 )
+
+def on_connect(connect: bool, peername=None):
+    # trace_connect is called with connect=True when client connects
+    if connect and peername:
+        ip, port = peername
+        logger.info(f"MODBUS CONNECT | ip={ip} port={port}")
+    elif not connect and peername:
+        ip, port = peername
+        logger.info(f"MODBUS DISCONNECT | ip={ip} port={port}")
 
 def create_context():
     device = ModbusDeviceContext(
@@ -29,6 +39,7 @@ async def start_modbus(context, identity):
     server = ModbusTcpServer(
         context=context,
         identity=identity,
-        address=("0.0.0.0", 502)
+        address=("0.0.0.0", 502),
+        trace_connect=lambda status: on_connect(status, getattr(status, 'peername', None)),
     )
     await server.serve_forever()
