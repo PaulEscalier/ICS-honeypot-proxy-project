@@ -11,14 +11,16 @@ TESTFR_CON = b"\x68\x04\x83\x00\x00\x00"
 class IEC104Server:
     async def handle_client(self, reader, writer):
         peer = writer.get_extra_info("peername")
-        logger.info(f"Client connected: {peer}")
+        client_ip = peer[0] if peer else "unknown"
+
+        logger.info(f"Client connected: {client_ip}")
 
         while True:
             data = await reader.read(1024)
             if not data:
                 break
 
-            logger.info(f"RX {peer}: {data.hex()}")
+            logger.info(f"RX {client_ip}: {data.hex()}")
 
             # STARTDT
             if data == STARTDT_ACT:
@@ -32,17 +34,18 @@ class IEC104Server:
 
             # Interrogation (C_IC_NA_1)
             elif b"\x64\x01" in data:
-                logger.info("Interrogation command received")
+                logger.info(f"Interrogation command received from {client_ip}")
                 writer.write(self.interrogation_response())
             elif len(data) > 6 and data[6] == 0x2D:
-                logger.info("Single Command received")
+                logger.info(f"Single Command received from {client_ip}")
                 response = handle_asdu(data)
                 if response:
                     writer.write(response)
 
             await writer.drain()
 
-        logger.info(f"Client disconnected: {peer}")
+        logger.info(f"Client disconnected: {client_ip}")
+
 
     def interrogation_response(self):
         # ASDU very basic (cause: activation confirmation)
